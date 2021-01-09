@@ -5,7 +5,6 @@
     using System.IO;
     using System.Linq;
     using System.Net;
-
     public class InstallPrerequisites
     {
         private static void Log(string logText)
@@ -21,9 +20,10 @@
 
             catch (Exception e)
             {
-                PrintError(e, "Couldn't write to log!", false);
+                PrintError(e, "Couldn't write to log!", true);
             }
         }
+
         private static void PrintError(Exception e, string errorMessage, bool fatal)
         {
             string enterAction = "continue";
@@ -43,18 +43,20 @@
             Console.WriteLine("\nPress Enter to " + enterAction + "...");
 
             //Log error
-            Log(String.Concat(logPrefix, "[ERROR] " + errorMessage + " (" + e.Message + ")"));
+            if (errorMessage != "Couldn't write to log!")
+                Log(String.Concat(logPrefix, "[ERROR] " + errorMessage + " (" + e.Message + ")"));
 
             //Press Enter to continue or quit
             Console.ReadLine();
-            Log("[USER] User pressed Enter to " + enterAction);
+            if (errorMessage != "Couldn't write to log!")
+                Log("[USER] User pressed Enter to " + enterAction);
             if (fatal)
                 System.Environment.Exit(1);
         }
 
         public static void Main(string[] args)
         {
-            string version = "0.3.1";
+            string version = "0.3.2";
 
             //Reset log
             if (File.Exists("aiopi.log"))
