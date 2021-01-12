@@ -14,9 +14,6 @@
       "url": "https://download.visualstudio.microsoft.com/download/pr/9845b4b0-fb52-48b6-83cf-4c431558c29b/41025de7a76639eeff102410e7015214/dotnet-runtime-3.1.10-win-x64.exe",
       "subKeyPath": "SOFTWARE\\WOW6432Node\\dotnet\\Setup\\InstalledVersions\\x64\\sharedfx\\Microsoft.NETCore.App",
       "valuePath": "3.1.10"
-    },
-    {
-      "url": ""
     }
   ],
 
