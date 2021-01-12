@@ -57,7 +57,7 @@
                 System.Environment.Exit(1);
         }
 
-        private static bool IsInstalled(string subKey, string value)
+        private static bool CheckRegistry(string subKey, string value)
         {
             //Retrieve registry key as read-only
             try
@@ -85,12 +85,21 @@
             return false;
         }
 
+        private static bool CheckDirectory(string directoryPath)
+        //This method will result in some false-positives, but honestly, how many people don't have their OS on the C drive?
+        {
+            return Directory.Exists(directoryPath);
+        }
+
         public static void Main(string[] args)
         {
             string version = "0.3.2";
             
-            if (IsInstalled(@"SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App", "3.1.10"))
+            if (CheckRegistry(@"SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App", "3.1.10"))
                 Console.WriteLine("all good");
+
+            if (CheckDirectory("C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\5.0.1"))
+                Console.WriteLine("double all good");
 
             //Reset log
             if (File.Exists("aiopi.log"))
