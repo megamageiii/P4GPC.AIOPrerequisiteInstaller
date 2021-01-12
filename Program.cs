@@ -1,10 +1,13 @@
 ﻿namespace PrerequisiteInstaller
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
+    using System;               //Console, Exception, ArgumentNullException, DateTime
+    using System.Diagnostics;   //Process
+    using System.IO;            //File, Directory, StreamWriter
+    using System.Linq;          //Count
+    using System.Net;           //WebClient
+    using System.Security;      //SecurityException
+    using Microsoft.Win32;      //Registry (Only Microsoft.Win32.Registry is included in ItemGroup, see .csproj)
+
     public class InstallPrerequisites
     {
         private static void Log(string logText)
@@ -54,9 +57,40 @@
                 System.Environment.Exit(1);
         }
 
+        private static bool IsInstalled(string subKey, string value)
+        {
+            //Retrieve registry key as read-only
+            try
+            {
+                RegistryKey sk = Registry.LocalMachine.OpenSubKey(subKey);
+                return (sk.GetValue(value).ToString() == "1");
+            }
+
+            catch(Exception e)
+            {
+                //Key value is null
+                if (e is ArgumentNullException)
+                    return false;
+
+                else
+                {
+                    //Write additional information if error is caused by security
+                    string errorMessage = "Couldn't read registry key " + subKey + "!";
+                    if (e is SecurityException)
+                        errorMessage += " Try running this program as an administrator.";
+                    PrintError(e, errorMessage, false);
+                }
+            }
+
+            return false;
+        }
+
         public static void Main(string[] args)
         {
             string version = "0.3.2";
+            
+            if (IsInstalled(@"SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App", "3.1.10"))
+                Console.WriteLine("all good");
 
             //Reset log
             if (File.Exists("aiopi.log"))
@@ -71,8 +105,7 @@
                 }
 
             //Create new log
-            Log("v" + version);
-            Log("[INFO] Created new log on " + DateTime.Now);
+            Log("All-In-One Prerequisite Installer v" + version + "\n[INFO] Created new log on " + DateTime.Now);
 
             //Set up variables
             string[] fileURLs = new string[] {
@@ -119,7 +152,7 @@
                         Log("[INFO] " + downloadText + " from " + fileURLs[i]);
 
                         //Download the file
-                        client.DownloadFile(fileURLs[i], "aiopi_downloads\\" + fileName);
+                        client.DownloadFile(fileURLs[i], @"aiopi_downloads\" + fileName);
 
                         Console.WriteLine("Done!");
                         Log("[INFO] Download successful, downloadSuccessCount = " + ++downloadSuccessCount);
