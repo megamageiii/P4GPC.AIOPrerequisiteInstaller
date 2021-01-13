@@ -6,6 +6,7 @@
     using System.Linq;          //Count
     using System.Net;           //WebClient
     using System.Security;      //SecurityException
+    using System.Text.Json;     //duh
     using Microsoft.Win32;      //Registry (Only Microsoft.Win32.Registry is included in ItemGroup, see .csproj)
 
     public class InstallPrerequisites
